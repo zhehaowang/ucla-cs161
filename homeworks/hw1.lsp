@@ -2,6 +2,10 @@
 
 ; Problem 1
 
+; TREE-CONTAINS checks if number N appears in ordered-tree TREE
+; param N number
+; param TREE list (ordered-tree)
+; return T or NIL
 (defun TREE-CONTAINS (N TREE)
   (cond
     ; base case: tree has only root, if root == N, T else nil
@@ -21,6 +25,9 @@
 
 ; Problem 2
 
+; TREE-MAX returns the maximum number from given ordered-tree
+; param TREE list (ordered-tree)
+; return number
 (defun TREE-MAX (TREE)
   (cond
     ; base case: tree has only root, return it
@@ -34,6 +41,9 @@
 
 ; Problem 3
 
+; TREE-ORDER returns the in-order traversal of given ordered-tree
+; param TREE list (ordered-tree)
+; return list
 (defun TREE-ORDER (TREE)
   (cond
     ; base case: tree has only root, return it
@@ -50,6 +60,11 @@
 ; Problem 4
 ; spec: what if start + len > len(l)? Say, (SUB-LIST '(a b c d) 3 3) => (d) is expected?
 
+; SUB-LIST returns x elements starting from index i in list l, where x, i and l are given.
+; param L list
+; param START number
+; param LEN number
+; return list
 (defun SUB-LIST (L START LEN)
   (cond
     ; len = 0 case
@@ -72,6 +87,9 @@
 ; Problem 5
 ; Make sure (SPLIT-LIST '(1)) => (() (1))? and (SPLIT-LIST ()) => (() ())?
 
+; SPLIT-LIST returns the list L split into two halves, first half has the same amount of elements as, or one less element than second half.
+; param L list (simple-list)
+; return list (a list of two lists)
 (defun SPLIT-LIST (L)
   (let ((size (length L)))
     (if (evenp size) 
@@ -89,6 +107,9 @@
 
 ; Problem 6
 
+; BTREE-HEIGHT returns the height of the given B-TREE
+; param TREE list (binary tree)
+; return number
 (defun BTREE-HEIGHT (TREE)
   (cond
     ; base case: tree has only root, height 0
@@ -109,6 +130,9 @@
 
 ; Problem 7
 
+; LIST2BTREE returns a binary tree converted from given list
+; param TREE list (simple list)
+; return list (binary tree)
 (defun LIST2BTREE (LEAVES)
   (let ((l (length LEAVES)))
     (cond 
@@ -134,6 +158,9 @@
 
 ; Problem 8
 
+; BTREE2LIST returns a list converted from given binary tree
+; param TREE list (binary tree)
+; return list (simple list)
 (defun BTREE2LIST (TREE)
   (if (null TREE) NIL
     (if (listp TREE)
@@ -155,6 +182,10 @@
 
 ; Problem 9; TODO: more test cases
 
+; IS-SAME checks if two params are the same without calling equals
+; param E1 list or atom
+; param E2 list of atom
+; return T or NIL
 (defun IS-SAME (E1 E2)
   (if (null E1) 
     ; if both are NIL, return T
