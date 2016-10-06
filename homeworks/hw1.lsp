@@ -1,4 +1,5 @@
-; TODO: for tree problems, check for usage of atom vs numberp; also, NULL check for problems
+; CS161 hw1 
+; Zhehao Wang zhehao@cs.ucla.edu 404380075
 
 ; Problem 1
 
@@ -199,20 +200,31 @@
           (if (= E1 E2) T NIL)
           NIL)
       )
-      ; if E1's a non-empty list, compare its first element with E2's first element
-      ; E2 could be NIL here, but won't affect the result of the test
-      (if (IS-SAME (car E1) (car E2)) (IS-SAME (cdr E1) (cdr E2)) NIL)
+      (if (atom E2)
+        ; if E1's a non-empty list, but E2's not a list
+        NIL
+        ; if E1's a non-empty list, and E2's a non-empty list, 
+        ; compare its first element with E2's first element
+        ; E2 could be NIL here, but won't affect the result of the test
+        (if (IS-SAME (car E1) (car E2)) 
+          (IS-SAME (cdr E1) (cdr E2)) 
+          NIL))
     )
   )
 )
 
 ; (IS-SAME NIL NIL)
 ; (IS-SAME NIL '(1 2))
-; (IS-SAME 1 NIL) ; 1 is not an expr, so this shouldn't be used to test
+; (IS-SAME 1 NIL)
+; (IS-SAME 1 2)
 ; (IS-SAME '(1) NIL)
 ; (IS-SAME '(1 2) NIL)
 ; (IS-SAME '(1 2) '(1 3))
 ; (IS-SAME '(1 2) '((1) 2))
 ; (IS-SAME '(1 (2 (4))) '(2 1 (4)))
-; (IS-SAME '((1 2 3) 8 8) '((1 2 3) 7 8))
+; (IS-SAME '((1 2 (3)) 7 8) '((1 2 (3)) 7 8))
 ; (IS-SAME '(1 2 3 7 8) '((1 2 3) 7 8))
+; (IS-SAME '(1 2) '(1))
+; (IS-SAME '(1) NIL)
+; (IS-SAME '(1) 1)
+; (IS-SAME 1 '(1))
