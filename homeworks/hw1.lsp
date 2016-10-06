@@ -1,3 +1,5 @@
+; TODO: for tree problems, check for usage of atom vs numberp; also, NULL check for problems
+
 ; Problem 1
 
 (defun TREE-CONTAINS (N TREE)
@@ -46,7 +48,7 @@
 ; (TREE-ORDER '((1 2 3) 5 (6 8 (9 10 (11 12 13)))))
 
 ; Problem 4
-; spec: what if start + len > len(l)? Say (SUB-LIST '(a b c d) 3 3) => (d) is expected?
+; spec: what if start + len > len(l)? Say, (SUB-LIST '(a b c d) 3 3) => (d) is expected?
 
 (defun SUB-LIST (L START LEN)
   (cond
@@ -68,11 +70,12 @@
 ; (SUB-LIST '(a b c d) 3 3)
 
 ; Problem 5
-; just to make sure (SPLIT-LIST '(1)) => (() (1))? and (SPLIT-LIST ()) => (() ())?
+; Make sure (SPLIT-LIST '(1)) => (() (1))? and (SPLIT-LIST ()) => (() ())?
 
 (defun SPLIT-LIST (L)
   (let ((size (length L)))
     (if (evenp size) 
+      ; call sub-list function for split-list, differentiate len(l) even/odd case
       (list (SUB-LIST L 0 (/ size 2)) (SUB-LIST L (/ size 2) (/ size 2)))
       (list (SUB-LIST L 0 (/ (- size 1) 2)) (SUB-LIST L (/ (- size 1) 2) (/ (+ size 1) 2)))
   ))
@@ -88,7 +91,9 @@
 
 (defun BTREE-HEIGHT (TREE)
   (cond
+    ; base case: tree has only root, height 0
     ((atom TREE) 0)
+    ; induction case: get the height of right / left tree, return the larger one + 1
     (t (let ((left (BTREE-HEIGHT (first TREE))) (right (BTREE-HEIGHT (second TREE))))
       (if (> left right) (+ left 1) (+ right 1)))
     )
@@ -107,9 +112,11 @@
 (defun LIST2BTREE (LEAVES)
   (let ((l (length LEAVES)))
     (cond 
+      ; base cases
       ((= l 0) NIL)
       ((= l 1) (car LEAVES))
       ((= l 2) LEAVES)
+      ; call split-list in recursive case to 
       (t (let ((res (SPLIT-LIST LEAVES)))
         (list (LIST2BTREE (first res)) (LIST2BTREE (second res)))
       ))
@@ -130,7 +137,9 @@
 (defun BTREE2LIST (TREE)
   (if (null TREE) NIL
     (if (listp TREE)
+      ; bracket removal by recursively looking at two subtrees
       (append (BTREE2LIST (first TREE)) (BTREE2LIST (second TREE)))
+      ; if it's a single element return as list so that append does not complain
       (list TREE)
     )
   )
@@ -148,24 +157,31 @@
 
 (defun IS-SAME (E1 E2)
   (if (null E1) 
+    ; if both are NIL, return T
     (if (null E2) T NIL)
     (if (atom E1)
       (if (null E2) 
+        ; if E1 is atom, and E2 is NIL, return NIL
         NIL
+        ; if E1 is atom and E2 is atom, compare the two with =
         (if (atom E2)
           (if (= E1 E2) T NIL)
           NIL)
       )
-      (IS-SAME (car E1) (car E2))
+      ; if E1's a non-empty list, compare its first element with E2's first element
+      ; E2 could be NIL here, but won't affect the result of the test
+      (if (IS-SAME (car E1) (car E2)) (IS-SAME (cdr E1) (cdr E2)) NIL)
     )
   )
 )
 
 ; (IS-SAME NIL NIL)
 ; (IS-SAME NIL '(1 2))
-; (IS-SAME 1 NIL) : 1 is not an expr, so this shouldn't be used to test
+; (IS-SAME 1 NIL) ; 1 is not an expr, so this shouldn't be used to test
+; (IS-SAME '(1) NIL)
 ; (IS-SAME '(1 2) NIL)
+; (IS-SAME '(1 2) '(1 3))
 ; (IS-SAME '(1 2) '((1) 2))
 ; (IS-SAME '(1 (2 (4))) '(2 1 (4)))
-; (IS-SAME '((1 2 3) 7 8) '((1 2 3) 7 8))
+; (IS-SAME '((1 2 3) 8 8) '((1 2 3) 7 8))
 ; (IS-SAME '(1 2 3 7 8) '((1 2 3) 7 8))
