@@ -31,16 +31,11 @@
       ))
 )
 
-; helper function that keeps track of current-depth we are at, and increment current depth until we are at max-depth
-(defun DFID-ITER (tree max-depth curr-depth)
-  (if (> curr-depth max-depth)
-    NIL
-    (append (DFID-STEP tree curr-depth) (DFID-ITER tree max-depth (+ curr-depth 1))) )
-)
-
 ; top-level function that wraps around iterative helper
 (defun DFID (tree max-depth)
-  (DFID-ITER tree max-depth 0)
+  (if (= 0 max-depth)
+    (DFID-STEP tree 0)
+    (append (DFID tree (- max-depth 1)) (DFID-STEP tree max-depth)) )
 )
 
 ; test cases
@@ -64,6 +59,7 @@
 ; (DFID-STEP '((a (b)) c (d)) 3)
 
 ; TODO: try (A (B C) (D) (E (F G)))
+; (DFID '(A (B C) (D) (E (F G))) 3)
 
 ; note: the input '(a) actually means a tree with 2 nodes, one root connecting to one leaf 'a
 
@@ -180,6 +176,7 @@
 ; NIL. It performs a depth-first search starting at the given state. It returns
 ; the path from the initial state to the goal state, if any, or NIL otherwise.
 (defun single-dfs (s path depth)
+  ; TODO: what's the point for this wrapper?
   (mult-dfs (list s) path depth)
 )
 
@@ -207,3 +204,6 @@
 ; operators to the current state.
 ; (succ-fn '(3 3 t)) -> ((0 1 NIL) (1 1 NIL) (0 2 NIL))
 ; (succ-fn '(1 1 t)) -> ((3 2 NIL) (3 3 NIL))
+
+; (id-dfs '(3 3 t) 0) -> ((3 3 T) (0 2 NIL) (3 2 T) (0 3 NIL) (3 1 T) (2 2 NIL) 
+;                        (2 2 T) (3 1 NIL) (0 3 T) (3 2 NIL) (0 2 T) (3 3 NIL))
