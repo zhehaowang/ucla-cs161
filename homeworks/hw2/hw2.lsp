@@ -1,3 +1,5 @@
+; Zhehao Wang, 404380075, zhehao@cs.ucla.edu
+
 ; problem 1
 
 (defun DFS (tree)
@@ -128,12 +130,12 @@
   )
 )
 
-(next-state '(3 3 T) 1 1)
-(next-state '(3 3 T) 2 0)
-(next-state '(3 3 T) 0 2)
-(next-state '(3 3 T) 1 0)
-(next-state '(3 3 T) 0 1)
-(next-state '(3 3 T) 0 0)
+; (next-state '(3 3 T) 1 1)
+; (next-state '(3 3 T) 2 0)
+; (next-state '(3 3 T) 0 2)
+; (next-state '(3 3 T) 1 0)
+; (next-state '(3 3 T) 0 1)
+; (next-state '(3 3 T) 0 0)
 
 ; SUCC-FN returns all of the possible legal successor states to the current
 ; state. It takes a single argument (S), which encodes the current state, and
