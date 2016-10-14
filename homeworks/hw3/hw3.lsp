@@ -137,13 +137,13 @@
 (defun getKeeperPosition (s row)
   (cond ((null s) nil)
 	(t (let ((x (getKeeperColumn (car s) 0)))
-	     (if x
+	  (if x
 		 ;keeper is in this row
 		 (list x row)
 		 ;otherwise move on
 		 (getKeeperPosition (cdr s) (+ row 1))
-		 );end if
-	       );end let
+		);end if
+	  );end let
 	 );end t
 	);end cond
   );end defun
@@ -176,8 +176,20 @@
 ; terminate until the whole search space is exhausted.
 ;
 (defun goal-test (s)
-  nil
+  (if (null s) 
+    t
+    (and (does-not-contains-box (car s)) (goal-test (cdr s))))
   );end defun
+
+; helper function that decides if a row contains a Box
+; param: simple list
+(defun does-not-contains-box (r)
+  (if (null r)
+    t
+    (if (isBox (car r))
+      nil
+      (does-not-contains-box (cdr r))))
+  )
 
 ; EXERCISE: Modify this function to return the list of
 ; sucessor states of s.
@@ -198,21 +210,109 @@
 ; Any NIL result returned from try-move can be removed by cleanUpList.
 ;
 (defun next-states (s)
-  (let* ((pos (getKeeperPosition s 0))
-	 (x (car pos))
-	 (y (cadr pos))
-	 ;x and y are now the coordinate of the keeper in s.
-	 (result nil)
-	 )
-    (cleanUpList result);end
-   );end let
+  ; (let* ((pos (getKeeperPosition s 0))
+	 ; (x (car pos))
+	 ; (y (cadr pos))
+	 ; ;x and y are now the coordinate of the keeper in s.
+	 ; (result nil)
+	 ; )
+  ;   (cleanUpList result);end
+  ;  );end let
+  (cleanUpList (list 
+    (try-move s 'up) 
+    (try-move s 'down) 
+    (try-move s 'left) 
+    (try-move s 'right)))
   );
+
+; Test cases:
+; (next-states p1)
+
+; get-square returns the content of square (r, c) given state S
+; param: list of lists, number, number
+(defun get-square (S r c)
+  (if (or (null S) (null (car S)))
+    wall
+    (if (= r 0)
+      (if (= c 0)
+        (car (car S))
+        (get-square (list (cdr (car S))) r (- c 1)))
+      (get-square (cdr S) (- r 1) c)))
+  )
+
+; Test cases:
+; (get-square p1 0 0)
+
+; set-square sets the content of square (r, c) in S to v
+; param: list of lists, number, number, number
+; note: this function does not handle input out of the range of the state matrix
+(defun set-square (S r c v)
+  (if (= r 0)
+    (cons (set-square-row (car S) c v) (cdr S))
+    (cons (car S) (set-square (cdr S) (- r 1) c v))
+  )
+)
+
+; helper function for set-square, takes in a list instead of a list of lists
+(defun set-square-row (R c v)
+  (if (= c 0)
+    (cons v (cdr R))
+    (cons (car R) (set-square-row (cdr R) (- c 1) v)))
+)
+
+; Test cases:
+; (set-square p1 0 0 0)
+
+(defun try-move (S D)
+  (let* ((pos (getKeeperPosition S 0))
+    (y (car pos))
+    (x (cadr pos)))
+    (cond 
+      ((equal D 'up) (try-move-helper S x y (- x 1) y (- x 2) y))
+      ((equal D 'down) (try-move-helper S x y (+ x 1) y (+ x 2) y))
+      ((equal D 'left) (try-move-helper S x y x (- y 1) x (- y 2)))
+      ((equal D 'right) (try-move-helper S x y x (+ y 1) x (+ y 2)))
+    )
+  )
+)
+
+(defun try-move-helper (S kx ky x y x1 y1)
+  (cond 
+    ; trying to move against wall
+    ((isWall (get-square S x y)) nil)
+    ; trying to push a box
+    ((or (isBox (get-square S x y)) (isBoxStar (get-square S x y)))
+      (if (or (isWall (get-square S x1 y1)) 
+        (isBox (get-square S x1 y1)) 
+        (isBoxStar (get-square S x1 y1))) 
+        ; we cannot push a box against a wall, another box, or boxstar
+        nil
+        ; we push the box
+        (let* (
+          (oldKeeperLoc (if (isKeeperStar (get-square S kx ky)) star blank))
+          (newKeeperLoc (if (isBoxStar (get-square S x y)) keeperstar keeper))
+          (newBoxLoc (if (isStar (get-square S x1 y1)) boxstar box)))
+          (set-square (set-square (set-square S x1 y1 newBoxLoc) x y newKeeperLoc) kx ky oldKeeperLoc)
+        )
+      ))
+    ; moving to a blank
+    ((or (isBlank (get-square S x y)) (isStar (get-square S x y)))
+      (let* (
+        (oldKeeperLoc (if (isKeeperStar (get-square S kx ky)) star blank))
+        (newKeeperLoc (if (isStar (get-square S x y)) keeperstar keeper)))
+        (set-square (set-square S x y newKeeperLoc) kx ky oldKeeperLoc)
+      ))
+  )
+)
+
+; Test cases:
+; 
 
 ; EXERCISE: Modify this function to compute the trivial
 ; admissible heuristic.
 ;
 (defun h0 (s)
-  )
+  0)
 
 ; EXERCISE: Modify this function to compute the
 ; number of misplaced boxes in s.
@@ -231,6 +331,9 @@
 ;
 (defun hUID (s)
   )
+
+; Integration test:
+; (printstates (a* p1 #'goal-test #'next-states #'h0) 0.2)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
