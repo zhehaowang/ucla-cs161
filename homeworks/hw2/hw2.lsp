@@ -114,6 +114,7 @@
 ;
 ; NOTE that next-state returns a list containing the successor state (which is
 ; itself a list); the return should look something like ((1 1 T)).
+; 
 ; We don't need to handle malformed input such as m + c = 0 or m + c > 2, since
 ; the caller succ-fn won't give these inputs
 (defun next-state (s m c)
