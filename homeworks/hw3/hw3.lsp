@@ -317,7 +317,20 @@
 ; EXERCISE: Modify this function to compute the
 ; number of misplaced boxes in s.
 ;
+; this heuristic is admissible, since it's going to take at least this number of moves to 
+; put all boxes in place
 (defun h1 (s)
+  (if (null s)
+    0
+    (+ (count-boxes-row (car s)) (h1 (cdr s))))
+  )
+
+(defun count-boxes-row (r)
+  (if (null r)
+    0
+    (if (isBox (car r))
+      (+ 1 (count-boxes-row (cdr r)))
+      (count-boxes-row (cdr r))))
   )
 
 ; EXERCISE: Change the name of this function to h<UID> where
@@ -329,11 +342,105 @@
 ; The Lisp 'time' function can be used to measure the
 ; running time of a function call.
 ;
-(defun hUID (s)
+
+; c: column count
+(defun find-all-stars-column (c-idx r r-idx)
+  (if (null r)
+    nil
+    (if (or (isStar (car r)) (isKeeperStar (car r)))
+      (cons (list c-idx r-idx) (find-all-stars-column c-idx (cdr r) (+ r-idx 1)))
+      (find-all-stars-column c-idx (cdr r) (+ r-idx 1))
+    )
   )
+)
+
+(defun find-all-stars (s c-idx)
+  (if (null s)
+    nil
+    (append (find-all-stars-column c-idx (car s) 0) (find-all-stars (cdr s) (+ c-idx 1)))
+  )
+)
+
+(defun find-all-boxes-column (c-idx r r-idx)
+  (if (null r)
+    nil
+    (if (isBox (car r))
+      (cons (list c-idx r-idx) (find-all-boxes-column c-idx (cdr r) (+ r-idx 1)))
+      (find-all-boxes-column c-idx (cdr r) (+ r-idx 1))
+    )
+  )
+)
+
+(defun find-all-boxes (s c-idx)
+  (if (null s)
+    nil
+    (append (find-all-boxes-column c-idx (car s) 0) (find-all-boxes (cdr s) (+ c-idx 1)))
+  )
+)
+
+(defun absolute (x)
+  (if (< x 0)
+    (- 0 x)
+    x)
+)
+
+(defun taxi-dist (p1 p2)
+  (+ (absolute (- (first p1) (first p2))) (absolute (- (second p1) (second p2))))
+)
+
+(defun find-min-dist (box stars current)
+  (if (null stars)
+    current
+    (let ((dist (taxi-dist box (car stars))))
+      (if (null current)
+        (find-min-dist box (cdr stars) dist)
+        (if (< dist current)
+          (find-min-dist box (cdr stars) dist)
+          (find-min-dist box (cdr stars) current)
+        )
+      )
+    )
+  )
+)
+
+(defun sum-min-dist (boxes stars)
+  (if (null boxes)
+    0
+    (+ (find-min-dist (car boxes) stars nil) (sum-min-dist (cdr boxes) stars))
+  )
+)
+
+(defun sum-keeper-dist (s keeper boxes)
+  (if (null boxes)
+    0
+    (- (+ (taxi-dist keeper (car boxes)) (sum-keeper-dist keeper (cdr boxes))) 1)
+  )
+)
+
+; (defun my-count (l)
+;   (cond
+;    ((null l) 0)
+;    (t (+ 1 (my-count (cdr l)))))
+; )
+
+(defun h404380075 (s)
+  (let (
+    (stars (find-all-stars s 0))
+    (boxes (find-all-boxes s 0))
+    (keeper (getKeeperPosition s 0)))
+    ;(append (list stars boxes))
+    ;(+ (my-count boxes) (my-count stars))
+    ;(+ (sum-min-dist boxes stars) (sum-keeper-dist s (list (second keeper) (first keeper)) boxes))
+    (sum-min-dist boxes stars)
+  )
+)
 
 ; Integration test:
+; (load "/Users/zhehaowang/projects/ucla-cs-2015/cs-161/homeworks/hw3/a-star.lsp")
+; (load "/Users/zhehaowang/projects/ucla-cs-2015/cs-161/homeworks/hw3/hw3.lsp")
 ; (printstates (a* p1 #'goal-test #'next-states #'h0) 0.2)
+; (printstates (a* p20 #'goal-test #'next-states #'h1) 0.2)
+; (printstates (a* p12 #'goal-test #'next-states #'h404380075) 0.2)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
