@@ -413,7 +413,29 @@
 (defun sum-keeper-dist (s keeper boxes)
   (if (null boxes)
     0
-    (- (+ (taxi-dist keeper (car boxes)) (sum-keeper-dist keeper (cdr boxes))) 1)
+    (- (+ (taxi-dist keeper (car boxes)) (sum-keeper-dist s keeper (cdr boxes))) 1)
+  )
+)
+
+(defun dead-check-box (s box)
+  (let ((s1 (get-square s (+ (first box) 1) (second box)))
+    (s2 (get-square s (first box) (+ (second box) 1)))
+    (s3 (get-square s (- (first box) 1) (second box)))
+    (s4 (get-square s (first box) (- (second box) 1))))
+    (if (and (or (isWall s1) (isBox s1) (isBoxStar s1)) (or (isWall s2) (isBox s2) (isBoxStar s2))) 
+      t
+      (if (and (or (isWall s3) (isBox s3) (isBoxStar s3)) (or (isWall s4) (isBox s4) (isBoxStar s4))) 
+        t
+        nil)))
+)
+
+(defun dead-check-state (s boxes)
+  (if (null boxes)
+    0
+    (if (dead-check-box s (car boxes))
+      2000
+      (dead-check-state s (cdr boxes))
+    )
   )
 )
 
@@ -430,8 +452,8 @@
     (keeper (getKeeperPosition s 0)))
     ;(append (list stars boxes))
     ;(+ (my-count boxes) (my-count stars))
-    ;(+ (sum-min-dist boxes stars) (sum-keeper-dist s (list (second keeper) (first keeper)) boxes))
-    (sum-min-dist boxes stars)
+    (+ (sum-min-dist boxes stars) (sum-keeper-dist s (list (second keeper) (first keeper)) boxes) (dead-check-state s boxes))
+    ;(sum-min-dist boxes stars)
   )
 )
 
