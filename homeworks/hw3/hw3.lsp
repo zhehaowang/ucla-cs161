@@ -209,6 +209,10 @@
 ; You will need to define the function try-move and decide how to represent UP,DOWN,LEFT,RIGHT.
 ; Any NIL result returned from try-move can be removed by cleanUpList.
 ;
+
+; Takes a current state s and returns the list of all possible succ states. 
+; The implementation of next-states follows the idea given in spec.
+; Coordinate system uses left-top point as (0, 0), whereas first element is column index and second is row index
 (defun next-states (s)
   ; (let* ((pos (getKeeperPosition s 0))
 	 ; (x (car pos))
@@ -263,6 +267,7 @@
 ; Test cases:
 ; (set-square p1 0 0 0)
 
+; try-move tries moving the keeper in given directions, and return the new state if move is illegal, nil if otherwise
 (defun try-move (S D)
   (let* ((pos (getKeeperPosition S 0))
     (y (car pos))
@@ -276,9 +281,14 @@
   )
 )
 
+; try-move-helper takes the location of keeper, first box in keeper's moving direction, and second box in that direction
+; kx, ky: numbers, coordinate of keeper
+; x, y: numbers, coordinate of the first block on keeper's moving direction
+; x1, y1: numbers, coordinate of the second block on keeper's moving direction; will not be used unless (x, y) is box or boxstar
+; return the resulting state if move succeeds, nil if not
 (defun try-move-helper (S kx ky x y x1 y1)
   (cond 
-    ; trying to move against wall
+    ; trying to move against wall, fail
     ((isWall (get-square S x y)) nil)
     ; trying to push a box
     ((or (isBox (get-square S x y)) (isBoxStar (get-square S x y)))
@@ -287,7 +297,7 @@
         (isBoxStar (get-square S x1 y1))) 
         ; we cannot push a box against a wall, another box, or boxstar
         nil
-        ; we push the box
+        ; otherwise, we push the box
         (let* (
           (oldKeeperLoc (if (isKeeperStar (get-square S kx ky)) star blank))
           (newKeeperLoc (if (isBoxStar (get-square S x y)) keeperstar keeper))
@@ -295,7 +305,7 @@
           (set-square (set-square (set-square S x1 y1 newBoxLoc) x y newKeeperLoc) kx ky oldKeeperLoc)
         )
       ))
-    ; moving to a blank
+    ; moving keeper to a blank
     ((or (isBlank (get-square S x y)) (isStar (get-square S x y)))
       (let* (
         (oldKeeperLoc (if (isKeeperStar (get-square S kx ky)) star blank))
@@ -343,7 +353,11 @@
 ; running time of a function call.
 ;
 
-; c: column count
+; find all stars in a given column, and return their (x, y) coordinates
+; helper for find-all-stars
+; c-idx: number, column index
+; r:     list, the column
+; r-idx: number, row index
 (defun find-all-stars-column (c-idx r r-idx)
   (if (null r)
     nil
@@ -354,6 +368,9 @@
   )
 )
 
+; find all stars in a given state, and return their (x, y) coordinates
+; c-idx: number, current column index
+; s:     list of list, current state
 (defun find-all-stars (s c-idx)
   (if (null s)
     nil
@@ -361,6 +378,8 @@
   )
 )
 
+; similar function as find-all-stars-column, looking for misplaced boxes instead
+; we don't include boxstar in this case
 (defun find-all-boxes-column (c-idx r r-idx)
   (if (null r)
     nil
@@ -371,6 +390,7 @@
   )
 )
 
+; similar function as find-all-stars, looking for boxes instead
 (defun find-all-boxes (s c-idx)
   (if (null s)
     nil
@@ -378,20 +398,25 @@
   )
 )
 
+; integer absolute value function
+; x: number
 (defun absolute (x)
   (if (< x 0)
     (- 0 x)
     x)
 )
 
-(defun taxi-dist (p1 p2)
+; manhattan distance between two coordinates in the state 
+; p1, p2: list with two numbers '(x, y)
+(defun man-dist (p1 p2)
   (+ (absolute (- (first p1) (first p2))) (absolute (- (second p1) (second p2))))
 )
 
+; find the closest star to a given box, and record the value in current
 (defun find-min-dist (box stars current)
   (if (null stars)
     current
-    (let ((dist (taxi-dist box (car stars))))
+    (let ((dist (man-dist box (car stars))))
       (if (null current)
         (find-min-dist box (cdr stars) dist)
         (if (< dist current)
@@ -403,6 +428,7 @@
   )
 )
 
+; calculate the sum of shortest distances between pairs of boxes and stars
 (defun sum-min-dist (boxes stars)
   (if (null boxes)
     0
@@ -410,30 +436,34 @@
   )
 )
 
+; calculate the sum of keeper's distance to all boxes
 (defun sum-keeper-dist (s keeper boxes)
   (if (null boxes)
     0
-    (- (+ (taxi-dist keeper (car boxes)) (sum-keeper-dist s keeper (cdr boxes))) 1)
+    (- (+ (man-dist keeper (car boxes)) (sum-keeper-dist s keeper (cdr boxes))) 1)
   )
 )
 
+; check if a box at a given location is stuck
+; s: list of list, the state
+; box: list of two numbers
 (defun dead-check-box (s box)
   (let ((s1 (get-square s (+ (first box) 1) (second box)))
     (s2 (get-square s (first box) (+ (second box) 1)))
     (s3 (get-square s (- (first box) 1) (second box)))
     (s4 (get-square s (first box) (- (second box) 1))))
-    (if (and (or (isWall s1) (isBox s1) (isBoxStar s1)) (or (isWall s2) (isBox s2) (isBoxStar s2))) 
-      t
-      (if (and (or (isWall s3) (isBox s3) (isBoxStar s3)) (or (isWall s4) (isBox s4) (isBoxStar s4))) 
-        t
-        nil)))
+    (or (and (isWall s1) (isWall s2)) (and (isWall s2) (isWall s3)) (and (isWall s3) (isWall s4)) (and (isWall s4) (isWall s1)))
+  )
 )
 
+; check if any misplaced box is stuck, if so, return an arbitrarily large number to discourage a* from attempting this path
+; s: list of list, the state
+; boxes: list of list, list of the coordinates of boxes
 (defun dead-check-state (s boxes)
   (if (null boxes)
     0
     (if (dead-check-box s (car boxes))
-      2000
+      3000
       (dead-check-state s (cdr boxes))
     )
   )
@@ -445,6 +475,15 @@
 ;    (t (+ 1 (my-count (cdr l)))))
 ; )
 
+; this heuristic takes into consideration of 
+;  1) the manhattan distance between a box and closest unused star (oblivious of walls in between)
+;  2) the total manhattan distance between the keeper and all boxes
+;  3) dead state: in which both a box's left, top; top, right; right, bottom; or bottom, left are walls
+; and produces the sum of all 3 as h(n). This heuristic wildly underestimates in scenarios like p20.
+; Inclusion of dead state is done using a hack: adding an arbitrarily large number to the cost so that
+; the solver is strongly discouraged to take it. 
+; As of right now, on a Macbook Pro running Clozure CL lisp environment, this heuristic cannot solve 
+; p20, p21 or p22 in reasonable time.
 (defun h404380075 (s)
   (let (
     (stars (find-all-stars s 0))
@@ -461,7 +500,7 @@
 ; (load "/Users/zhehaowang/projects/ucla-cs-2015/cs-161/homeworks/hw3/a-star.lsp")
 ; (load "/Users/zhehaowang/projects/ucla-cs-2015/cs-161/homeworks/hw3/hw3.lsp")
 ; (printstates (a* p1 #'goal-test #'next-states #'h0) 0.2)
-; (printstates (a* p20 #'goal-test #'next-states #'h1) 0.2)
+; (printstates (a* p5 #'goal-test #'next-states #'h1) 0.2)
 ; (printstates (a* p12 #'goal-test #'next-states #'h404380075) 0.2)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
