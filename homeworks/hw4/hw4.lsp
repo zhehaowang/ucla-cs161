@@ -48,14 +48,25 @@
   )
 )
 
-(defun copy-n-reverse-last (array length)
+(defun element-abs (value)
+  (if (< value 0)
+    (- 0 value)
+    value
+  )
+)
+
+(defun array-abs (array)
   (cond
-    ; don't expect this to happen
     ((null array) nil)
-    ; don't epect this to happen
-    ((<= length 0) nil)
-    ((= length 1) (list (- 0 (car array))))
-    (t (cons (car array) (copy-n-reverse-last (cdr array) (- length 1))))
+    (t (cons (element-abs (car array)) (array-abs (cdr array))))
+  )
+)
+
+(defun copy-and-reverse-at-idx (array idx)
+  (cond
+    ((null array) nil)
+    ((= idx 1) (cons (- 0 (car array)) (array-abs (cdr array))))
+    (t (cons (car array) (copy-and-reverse-at-idx (cdr array) (- idx 1))))
   )
 )
 
@@ -75,26 +86,33 @@
   )
 )
 
-(defun dfs (n current delta)
-  (let ((depth (length current)))
-    (if (equal depth n) 
-      (if (check-clauses current delta)
-        current
-        (let ((idx (find-backtrack-point (reverse current))))
-          (if (= idx depth)
-            nil
-            (dfs n (copy-n-reverse-last current (- depth idx)) delta)
-          )
+(defun dfs (n sequence seqlen delta)
+  (if (equal seqlen n) 
+    (if (check-clauses sequence delta)
+      sequence
+      (let ((idx (find-backtrack-point (reverse sequence))))
+        (if (= idx n)
+          nil
+          (dfs n (copy-and-reverse-at-idx sequence (- n idx)) (- n idx) delta)
         )
       )
-      (dfs n (append current (list (+ depth 1))) delta)
     )
+    (dfs n sequence (+ seqlen 1) delta)
+  )
+)
+
+(defun default-sequence (n)
+  (if (= n 0)
+    nil
+    (append (default-sequence (- n 1)) (list n))
   )
 )
 
 (defun sat? (n delta) 
-  (dfs n '() delta)
+  (dfs n (default-sequence n) 0 delta)
 )
+; (dfs 3 (default-sequence 3) 0 '((1 2) (-1 2) (-2)))
 
 ; (load "/Users/zhehaowang/projects/ucla-cs-2015/cs-161/homeworks/hw4/hw4.lsp")
 ; (solve-cnf "/Users/zhehaowang/projects/ucla-cs-2015/cs-161/homeworks/hw4/cnfs/sat/cnf_10.cnf")
+; (solve-cnf "/Users/zhehaowang/projects/ucla-cs-2015/cs-161/homeworks/hw4/cnfs/unsat/cnf_20.cnf")
