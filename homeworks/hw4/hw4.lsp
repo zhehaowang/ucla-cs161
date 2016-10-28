@@ -1,30 +1,20 @@
 ; Homework 4
 ; Zhehao Wang, 404380075, zhehao@cs.ucla.edu
 
+; A backtracking DFS SAT solver with variable ordering and forward checking with modus-ponens
+; On a Macbook Pro running Clozure CL, this solves sat_50 in matter of seconds, and takes a few minutes to solve unsat_42
+; haven't tried with new test cases
 
-(defun split-line (line)
-  (if (equal line :eof)
-      :eof
-      (with-input-from-string (s line) (loop for x = (read s nil) while x collect x))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; hw4 code
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun read-cnf (filename)
-  (with-open-file (in filename)
-    (loop for line = (split-line (read-line in nil :eof)) until (equal line :eof)
-      if (equal 'p (first line)) collect (third line)      ; var count
-      if (integerp (first line)) collect (butlast line)))) ; clause
-
-(defun parse-cnf (filename)
-  (let ((cnf (read-cnf filename))) (list (car cnf) (cdr cnf))))
-
-; Following is a helper function that combines parse-cnf and sat?
-(defun solve-cnf (filename)
-  (let ((cnf (parse-cnf filename))) (sat? (first cnf) (second cnf))))
-
-
+; helper function for printing cnf
 (defun print-cnf (filename)
   (let ((cnf (parse-cnf filename))) (second cnf))
 )
 
+; check if value or its complement is covered by an assignment (list of vars)
 (defun in-assign (assign value)
   (cond
     ((null assign) nil)
@@ -34,6 +24,7 @@
   )
 )
 
+; check if a clause if satisfied by an assignment (list of vars)
 (defun check-clause (assign clause)
   (if (null clause)
     nil
@@ -44,6 +35,7 @@
   )
 )
 
+; check all clauses if satisfied by an assignment
 (defun check-clauses (assign delta)
   (if (null delta)
     t
@@ -51,6 +43,7 @@
   )
 )
 
+; absolute function
 (defun element-abs (value)
   (if (< value 0)
     (- 0 value)
@@ -58,6 +51,7 @@
   )
 )
 
+; take the absolute of all elements of an array
 (defun array-abs (array)
   (cond
     ((null array) nil)
@@ -130,6 +124,7 @@
       )
 ))
 
+; default sequence is (1 2 3 4...)
 (defun default-sequence (n)
   (if (= n 0)
     nil
@@ -137,10 +132,12 @@
   )
 )
 
+; this orders the variables according to how many times it appears in all clauses
 (defun variable-ordering-sequence (n delta)
   (extract-first (insertion-sort (preprocess-delta (generate-counts n) delta)))
 )
 
+; top-level function for sat
 (defun sat? (n delta) 
   (dfs n (variable-ordering-sequence n delta) 0 (list delta))
 )
@@ -149,9 +146,11 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; variable ordering related functions
+; this orders the variable by the number of occurrences in all clauses
+; the intuition's that the more a literal appears, the more likely its (early) assignment will be constraining
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; insertion sorting
+; insertion sort
 (defun insertion-sort (my-list)
   (if (null my-list)
     '()
@@ -174,6 +173,8 @@
   )
 )
 
+; increment the count given a certain key
+; count is a list of [(key, count)], where key is the element
 (defun increment-count (counts value)
   (cond 
     ((null counts) counts)
@@ -182,6 +183,7 @@
   )
 )
 
+; count the occurrences of all literals in one clause, returns the [(key, count)] structure
 (defun preprocess-clause (counts clause)
   (cond
     ((null clause) counts)
@@ -191,6 +193,7 @@
   )
 )
 
+; count the occurrences of all literals of all terms, returns the [(key, count)] structure
 (defun preprocess-delta (counts delta)
   (cond
     ((null delta) counts)
@@ -200,6 +203,7 @@
   )
 )
 
+; generate the [(1 0)(2 0)...] structure
 (defun generate-counts (n)
   (cond
     ((= n 0) nil)
@@ -208,7 +212,8 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; stack implementation
+; stack
+; pop and get element from a stack implementation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun my-pop (my-list)
@@ -236,8 +241,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; deduction using modus-ponens logic
+; this only tries the assigned variables with the whole set of clauses
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; returns the first single-literal clause in delta
 (defun find-first-single-literal (delta)
   (cond
     ((null delta) nil)
@@ -247,6 +254,7 @@
   )
 )
 
+; remove the first single-literal clause in delta
 (defun remove-first-single-literal (delta)
   (cond
     ((null delta) nil)
@@ -256,6 +264,7 @@
   )
 )
 
+; apply a single modus-ponens
 (defun modus-ponens (single-literal literals)
   (if (null literals)
     nil
@@ -267,6 +276,7 @@
   )
 )
 
+; helper function for reducing all clauses given first seqlen in sequence literals (assignments) 
 (defun reduce-helper (sequence seqlen delta result)
   (if (= seqlen 0)
     ; done with literals we have so far
@@ -284,6 +294,8 @@
     )
 ))
 
+; top-level function for reducing all clauses given first seqlen in sequence literals (assignments) 
+; tells that we reach the end by checking if we end up on a fixed point after applying reduce-helper
 (defun my-reduce (sequence seqlen delta)
   (let ((res (reduce-helper sequence seqlen delta '())))
     (if (null res)
@@ -297,6 +309,35 @@
     )
   )
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; provided code: CNF file parser
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; (defun split-line (line)
+;   (if (equal line :eof)
+;       :eof
+;       (with-input-from-string (s line) (loop for x = (read s nil) while x collect x))))
+
+; (defun read-cnf (filename)
+;   (with-open-file (in filename)
+;     (loop for line = (split-line (read-line in nil :eof)) until (equal line :eof)
+;       if (equal 'p (first line)) collect (third line)      ; var count
+;       if (integerp (first line)) collect (butlast line)))) ; clause
+
+; (defun parse-cnf (filename)
+;   (let ((cnf (read-cnf filename))) (list (car cnf) (cdr cnf))))
+
+; ; Following is a helper function that combines parse-cnf and sat?
+; (defun solve-cnf (filename)
+;   (let ((cnf (parse-cnf filename))) (sat? (first cnf) (second cnf))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; simple test cases and unused code
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+; this does further reduction 
+; (applies modus-ponens until unapplicable; cannot differentiate nil or t for now so commented)
 
 ; (defun result-reduce (literal delta)
 ;   (let* ((res (my-reduce literal 1 delta)) (start (find-first-single-literal res)))
