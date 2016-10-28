@@ -59,6 +59,9 @@
   )
 )
 
+; copy first idx elements of an array, and reverse the sign of the last
+; helper function for backtracking;
+; probably should've gone for a full-fledged stack instead as we did for the reduced rules in dfs function signature
 (defun copy-and-reverse-at-idx (array idx)
   (cond
     ((null array) nil)
@@ -81,6 +84,7 @@
     (append (reverse-list (cdr array)) (list (car array))))
 )
 
+; given an array, find the first non-negative element, that's the one we'll backtrack from
 (defun find-backtrack-point (array)
   (cond
     ((null array) 0)
@@ -91,6 +95,13 @@
   )
 )
 
+; recursive dfs call for backtracking search
+; signature: n, number of elements
+;            sequence, the order of assignment given as a list
+;            seqlen, the number of assignments we've done so far
+;            delta, the stack of (reduced) clauses. For example, '(((1 2) (-1 3)) ((2 3))), 
+;              signifying that for every backtrack we do, we pop one element to restore the clauses, 
+;              otherwise (if we are moving forward with assignments instead of backtracking), we keep using (each time) reduced clauses (reduced by modus-ponens)
 (defun dfs (n sequence seqlen delta)
   (let* 
     ((clauses (get-last delta)) 
