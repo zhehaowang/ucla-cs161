@@ -10,9 +10,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; helper function for printing cnf
-(defun print-cnf (filename)
-  (let ((cnf (parse-cnf filename))) (second cnf))
-)
+; (defun print-cnf (filename)
+;   (let ((cnf (parse-cnf filename))) (second cnf))
+; )
 
 ; check if value or its complement is covered by an assignment (list of vars)
 (defun in-assign (assign value)
@@ -322,26 +322,26 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; provided code: CNF file parser
+; provided code: CNF file parser; left uncommented for easier testing
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; (defun split-line (line)
-;   (if (equal line :eof)
-;       :eof
-;       (with-input-from-string (s line) (loop for x = (read s nil) while x collect x))))
+(defun split-line (line)
+  (if (equal line :eof)
+      :eof
+      (with-input-from-string (s line) (loop for x = (read s nil) while x collect x))))
 
-; (defun read-cnf (filename)
-;   (with-open-file (in filename)
-;     (loop for line = (split-line (read-line in nil :eof)) until (equal line :eof)
-;       if (equal 'p (first line)) collect (third line)      ; var count
-;       if (integerp (first line)) collect (butlast line)))) ; clause
+(defun read-cnf (filename)
+  (with-open-file (in filename)
+    (loop for line = (split-line (read-line in nil :eof)) until (equal line :eof)
+      if (equal 'p (first line)) collect (third line)      ; var count
+      if (integerp (first line)) collect (butlast line)))) ; clause
 
-; (defun parse-cnf (filename)
-;   (let ((cnf (read-cnf filename))) (list (car cnf) (cdr cnf))))
+(defun parse-cnf (filename)
+  (let ((cnf (read-cnf filename))) (list (car cnf) (cdr cnf))))
 
-; ; Following is a helper function that combines parse-cnf and sat?
-; (defun solve-cnf (filename)
-;   (let ((cnf (parse-cnf filename))) (sat? (first cnf) (second cnf))))
+; Following is a helper function that combines parse-cnf and sat?
+(defun solve-cnf (filename)
+  (let ((cnf (parse-cnf filename))) (sat? (first cnf) (second cnf))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ; simple test cases and unused code
