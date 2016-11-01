@@ -119,6 +119,8 @@
         )
         ; forward checking thinks this could work, so we proceed;
         (if (equal seqlen n) 
+          ; TODO: check-clauses here should actually use original instead of reduced?
+          ; would there be a difference?
           (if (check-clauses sequence reduced)
             ; the current sequence works, we return
             sequence

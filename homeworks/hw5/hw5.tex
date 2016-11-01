@@ -1,0 +1,160 @@
+\documentclass{article}
+
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{pbox}
+
+\title{Homework 5}
+
+\author{Zhehao Wang, 404380075, zhehao@cs.ucla.edu}
+
+\begin{document}
+
+\maketitle
+
+1.
+1). Show equivalence between $P \implies \neg Q$ and $Q \implies \neg P$ using truth table.
+
+\begin{center}
+  \begin{tabular}{ c | c | c | c }
+    \hline
+    P & Q & $P \implies \neg Q$ & $Q \implies \neg P$ \\ \hline
+    T & T & F & F \\ \hline
+    T & F & T & T \\ \hline
+    F & T & T & T \\ \hline
+    F & F & T & T \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\bigbreak
+2). Show equivalence between $P \implies \neg Q$ and $(P \wedge \neg Q) \vee (\neg P \wedge Q)$ using truth table.
+
+\begin{center}
+  \begin{tabular}{ c | c | c | c }
+    \hline
+    P & Q & $P \implies \neg Q$ & $(P \wedge \neg Q) \vee (\neg P \wedge Q)$ \\ \hline
+    T & T & F & F \\ \hline
+    T & F & T & T \\ \hline
+    F & T & T & T \\ \hline
+    F & F & T & T \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\bigbreak
+2.
+1). Sentence $(Smoke \implies Fire) \implies (\neg Smoke \implies \neg Fire)$ is neither valid nor unsatisfiable.
+% This evaluates to (Smoke or (not Fire))
+
+\begin{center}
+  \begin{tabular}{ c | c | c }
+    \hline
+    Smoke & Fire & $(Smoke \implies Fire) \implies (\neg Smoke \implies \neg Fire)$ \\ \hline
+    T & T & T \\ \hline
+    T & F & T \\ \hline
+    F & T & F \\ \hline
+    F & F & T \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\bigbreak
+2). Sentence $(Smoke \implies Fire) \implies ((Smoke \vee Heat) \implies Fire)$ is neither valid nor unsatisfiable.
+% This evaluates to (S or F or (not H))
+
+\begin{center}
+  \begin{tabular}{ c | c | c | c}
+    \hline
+    Smoke & Fire & Heat & $(Smoke \implies Fire) \implies ((Smoke \vee Heat) \implies Fire)$ \\ \hline
+    T & T & T & T \\ \hline
+    T & T & F & T \\ \hline
+    T & F & T & T \\ \hline
+    T & F & F & T \\ \hline
+    F & T & T & T \\ \hline
+    F & T & F & T \\ \hline
+    F & F & T & F \\ \hline
+    F & F & F & T \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\bigbreak
+3). Sentence $((Smoke \wedge Heat) \implies Fire) \iff ((Smoke \implies Fire) \vee (Heat \implies Fire))$ is valid.
+% This evaluates to true.
+
+\begin{center}
+  \begin{tabular}{ c | c | c | c }
+    \hline
+    Smoke & Fire & Heat & \pbox{60mm}{$((Smoke \wedge Heat) \implies Fire) \iff ((Smoke \implies Fire) \vee (Heat \implies Fire))$} \\ \hline
+    T & T & T & T \\ \hline
+    T & T & F & T \\ \hline
+    T & F & T & T \\ \hline
+    T & F & F & T \\ \hline
+    F & T & T & T \\ \hline
+    F & T & F & T \\ \hline
+    F & F & T & T \\ \hline
+    F & F & F & T \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\bigbreak
+3. Variables involved are $Mythical$, $Mortal$, $Mammal$, $Horned$, $Magical$.
+
+(a) KB is the conjunction of the following sentences:
+
+$Mythical \implies \neg Mortal$
+
+$\neg Mythical \implies (Mortal \wedge Mammal)$
+
+$(\neg Mortal \vee Mammal) \implies Horned$
+
+$Horned \implies Magical$
+
+\bigbreak
+(b) CNF representation of the KB (KB is the conjunction of the following clauses):
+
+1. $\neg Mythical \vee \neg Mortal$
+
+2a. $Mythical \vee Mortal$
+
+2b. $Mythical \vee Mammal$
+
+3a. $Mortal \vee Horned$
+
+3b. $\neg Mammal \vee Horned$
+
+4. $\neg Horned \vee Magical$
+
+\bigbreak
+(c.1) Is unicorn mythical? 
+
+Add c1. $\neg Mythical$ to the KB, and apply resolution:
+
+c2. $Mortal$, from c1 and 2a
+
+c3. $Mammal$, from c1 and 2b
+
+c4. $Horned$, from c3 and 3b
+
+c5. $Magical$, from c4 and 4
+
+And we can't derive any further, thus we can't prove unicorn is $Mythical$.
+
+\bigbreak
+(c.2) Is unicorn magical? horned? 
+
+Apply resolution to the original KB:
+
+5. $\neg Mortal \vee Mammal$, from 1 and 2b
+
+6. $Horned \vee Mammal$, 5 and 3a
+
+7. $Horned$, 6 and 3b
+
+8. $Magical$, 7 and 4
+
+Given 7 and 8, unicorn is $Horned$ and $Magical$.
+
+\end{document}
