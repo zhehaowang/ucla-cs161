@@ -1,5 +1,87 @@
-Problem 3.
+Zhehao Wang
+404380075
+zhehao@cs.ucla.edu
 
-Graph 1 can be colored with 4 colors; graph 2 can be colored with 8 colors.
+* Problem 1.
 
-(Note: when compiling rsat_2.02 on Mac, remove -static flag from gcc parameter list)
+(a) subst({x/A, y/B, z/B})
+(b) no unifiers
+(c) subst({x/B, y/A})
+(d) subst({x/John, y/John})
+(e) no unifiers
+
+* Problem 2.
+
+(a)
+(A x)(food(x) => like(John, x))
+food(Apples)
+food(Chicken)
+(A x, y)(eat(y, x) & ~kill(x, y)) => food(x))
+(A x, y)(kill(x, y) => ~alive(y))
+eat(Bill, Peanut) & alive(Bill)
+(A x)(eat(Bill, x) => eat(Sue, x))
+
+(b)
+1. ~food(x1) | like(John, x1)
+2. food(Apples)
+3. food(Chicken)
+4. ~eat(y4, x4) | kill(x4, y4) | food(x4)
+5. ~kill(x5, y5) | ~alive(y5)
+6. eat(Bill, Peanut)
+7. alive(Bill)
+8. ~eat(Bill, x8) | eat(Sue, x8)
+and append ~alpha to KB:
+a. ~like(John, Peanut)
+
+(c)
+c9.  ~kill(x5, Bill), from 5 and 7, subst({y5/Bill})
+c10. kill(Peanut, Bill) | food(Peanut), from 4 and 6, subst({y4/Bill, x4/Peanut})
+c11. food(Peanut), from c9 and c10, subst({x5/Peanut})
+c12. like(John, Peanut), from 1 and c11, subst({x1/Peanut})
+c13. false, from a and c12
+Since we derived false from delta & ~alpha, we know that John likes Peanut
+
+(d)
+d9. eat(Sue, Peanut), from 6 and 8, subst({x8/Peanut})
+Also we have c11. food(Peanut)
+Thus we know that Sue eats the food Peanut
+
+(e)
+We remove 6 and 7 from KB, and add the following:
+(A x)(~die(x) => (E y) eat(x, y))
+(A x)(die(x) => ~alive(x))
+alive(Bill)
+
+Converting to CNF
+e9.  die(x) or eat(x, f(x))
+e10. ~die(x) or ~alive(x)
+e11. alive(Bill)
+
+e12. eat(x, f(x)) or ~alive(x), from e9 and e10
+e13. eat(Bill, f(Bill)), from e12 and e11, subst({x/Bill})
+e14. eat(Sue, f(Bill)), 8 and e13, subst({x8/f(Bill)})
+e15. kill(f(Bill), Bill) | food(f(Bill)), from 4 and e13, subst({y4/Bill, x4/f(Bill)})
+e16. ~kill(x5, Bill), from 5 and e11, subst({y5/Bill})
+e17. food(f(Bill)), from e15 and e16, subst({x5/f(Bill)})
+Given e17, e14, and 3, we can unify by subst({f(Bill)/Chicken}); similarly for e17, e14 and 2.
+Thus we know Sue eats the food Chicken and Apples.
+
+* Problem 3.
+
+Graph 1 coloring is not satisfiable with 3 colors.
+
+Graph 1 coloring is satisfiable with 4 colors.
+
+They tell that an assignment exists for the given constraint satisfaction problem if each variable shares the same domain consisting of 4 values; and 4 is the minimum number of values required in the domain for the constraints of this problem to be satisfiable. 
+(4-coloring satisfiability holds for all planary graphs, though technically this cannot be shown by just this instance).
+
+One coloring for graph 1 would be:
+Node1 - 1
+Node2 - 2
+Node5 - 3
+Node6 - 2
+Node7 - 3
+Node3 - 1
+Node4 - 4
+
+Graph 2 coloring is satisfiable with 8 colors at minimum.

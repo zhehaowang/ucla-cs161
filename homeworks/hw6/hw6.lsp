@@ -73,7 +73,8 @@
 ; test
 ; (::cd "/Users/zhehaowang/projects/ucla-cs-2015/cs-161/homeworks/hw6")
 ; (load "hw6.lsp")
-; (graph-coloring-to-sat "graph1.txt" "sat1.txt" 4)
+; (graph-coloring-to-sat "graph1.txt" "sat1_3.txt" 3)
+; (graph-coloring-to-sat "graph1.txt" "sat1_4.txt" 4)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Your exercises end here. Below are top-level

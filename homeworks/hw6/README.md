@@ -1,0 +1,1 @@
+(Note: when compiling rsat_2.02 on Mac, remove -static flag from gcc parameter list)
