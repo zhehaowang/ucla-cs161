@@ -73,6 +73,8 @@ Graph 1 coloring is not satisfiable with 3 colors.
 Graph 1 coloring is satisfiable with 4 colors.
 
 They tell that an assignment exists for the given constraint satisfaction problem if each variable shares the same domain consisting of 4 values; and 4 is the minimum number of values required in the domain for the constraints of this problem to be satisfiable. 
+Specifically for a 4-coloring solution that SAT solver gives, "-1 -28 -27 -26 25 -5 -9 -21 -24 -23 22 -14 -2 -18 -20 -19 17 -13 -16 15 -11 -12 10 -6 -8 7 -3 4 0" tells that node 1 is colored with color 4 since 4 is the only positive term among 1, 2, 3, 4; etc.
+
 (4-coloring satisfiability holds for all planary graphs, though technically this cannot be shown by just this instance).
 
 One coloring for graph 1 would be:
