@@ -71,6 +71,14 @@ I(A, {}, BE), I(B, {}, AC), I(C, A, BDE), I(D, AB, CE), I(E, B, ACDFG),
 I(F, CD, ABE), I(G, F, ABCDEH), I(H, EF, ABCDG)
 
 (b) 
+d_separated(A,BH,E) is false. 
+Path A-C-F-H-E is not blocked: C (sequential), F (sequential) are open since C, F are not in {B, H}, H (convergence) is open since H is in {B, H}
+
+d_separated(G,D,E) is true.
+Paths from G to E go through either D or H. D (sequential) is blocked since D is in {D}, and H (convergence) is blocked since H is not in {D}
+
+d_separated(AB,F,GH) is false.
+Path B-E-H is not blocked: E (sequential) is open since E is not in {F}.
 
 (c) P(a, b, c, d, e, f, g, h) = P(a) * P(b) * P(c | a) * P(d | a,b) * P(e | b) * P(f | c,d) * P(h | e,f) * P(g | f)
 
