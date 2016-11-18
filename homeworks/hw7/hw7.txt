@@ -2,26 +2,30 @@ Zhehao Wang
 404380075
 zhehao@cs.ucla.edu
 
- * Problem 1. 
+
+ ** Problem 1. 
 
 (a) Apply Bayesian conditioning:
 P(A, B | K) = P(A, B, K) / P(K)
 P(A | B, K) * P(B | K)
   = (P(A, B, K) / P(B, K)) * (P(B, K) / P(K))
   = P(A, B, K) / P(K)
-And we have P(A, B | K) = P(A | B, K) * P(B | K)
+So we have P(A, B | K) = P(A | B, K) * P(B | K)
 
 (b) Apply Bayesian conditioning:
 P(A | B, K) = P(A, B, K) / P(B, K)
 P(B | A, K) * P(A | K) / P(B | K)
   = (P(A, B, K) / P(A, K)) * (P(A, K) / P(K)) / (P(B, K) / P(K))
   = P(A, B, K) / P(B, K)
-And we have P(A | B, K) = P(B | A, K) * P(A | K) / P(B | K)
+So we have P(A | B, K) = P(B | A, K) * P(A | K) / P(B | K)
 
- * Problem 2.
 
+ ** Problem 2.
+
+According to the problem description: 
+(O - Oil, G - Natural Gas, ~O && ~G - neither is present; O, G, ~O && ~G are exclusive and exhaustive)
 P(O) = 0.5
-P(G) = 0.2, G and O are exclusive
+P(G) = 0.2, since G and O are exclusive
 P(~O, ~G) = 0.3
 P(T | O) = 0.9
 P(T | G) = 0.3
@@ -37,38 +41,57 @@ P(T, ~O, ~G) = P(T | ~O, ~G) * P(~O, ~G) = 0.03
 Thus we have
 P(T) = 0.45 + 0.06 + 0.03 = 0.54
 P(O | T) = 0.9 * 0.5 / 0.54 = 0.83
+
 So probability of oil being present given test is positive is 0.83.
 
- * Problem 3
 
-Joint probability distribution:
+ ** Problem 3
 
-World  Square Black One Probability
-1      T      T     T   2/13
-2      T      T     F   4/13
-3      F      T     T   1/13
-4      F      T     F   2/13
-5      T      F     T   1/13
-6      T      F     F   1/13
-7      F      F     T   1/13
-8      F      F     F   1/13
+Probability distribution table:
+(variables are Square, Black and One; each has value T or F)
+
+World Square Black One Probability
+w1      T      T     T   2/13
+w2      T      T     F   4/13
+w3      F      T     T   1/13
+w4      F      T     F   2/13
+w5      T      F     T   1/13
+w6      T      F     F   1/13
+w7      F      F     T   1/13
+w8      F      F     F   1/13
 
 alpha1: Black = T
 P(alpha1) = P(w1) + P(w2) + P(w3) + P(w4) = 9/13 = 0.69
+
 alpha2: Square = T
 P(alpha2) = P(w1) + P(w2) + P(5) + P(6) = 8/13 = 0.62
-alpha3: (One = T || Black = T) => (Square = T)
-P(alpha3) = P(1) + P(2) + P(5) + P(6) + P(8) = 9/13 = 0.69
 
-Given Gamma, Alpha and Beta are independent of each other: 
+alpha3: (Square = T | One = T || Black = T)
+P(alpha3)
+  = P(Square = T && (One = T || Black = T)) / P(One = T || Black = T)
+  = (P(w1) + P(w2) + P(w5)) / (P(w1) + P(w2) + P(w3) + P(w4) + P(w5) + P(w7)) = 7/11 = 0.64
+
+The following two satisfies "given Gamma, Alpha and Beta are independent of each other": 
 {Gamma: Black, Alpha: One, Beta: Square}
-{Gamma: ~(~Black && ~One && ~Square), Alpha: One, Beta: Black}
+P(One | Square, Black) = P(One | Black) = 1/3
+P(Square | One, Black) = P(Square | Black) = 2/3
 
- * Problem 4
+{Gamma: ~(~Black && One && ~Square), Alpha: One, Beta: Black}
+Gamma removes world w7, among the rest we have
+P(One | Gamma, Black) = P(One | Gamma) = 1/3
+P(Black | One, Gamma) = P(Black | Gamma) = 3/4
+
+ ** Problem 4
 
 (a) Markovian assumptions: 
-I(A, {}, BE), I(B, {}, AC), I(C, A, BDE), I(D, AB, CE), I(E, B, ACDFG),
-I(F, CD, ABE), I(G, F, ABCDEH), I(H, EF, ABCDG)
+I(A, {}, BE), 
+I(B, {}, AC), 
+I(C, A, BDE), 
+I(D, AB, CE), 
+I(E, B, ACDFG),
+I(F, CD, ABE), 
+I(G, F, ABCDEH), 
+I(H, EF, ABCDG)
 
 (b) 
 d_separated(A,BH,E) is false. 
@@ -80,10 +103,13 @@ Paths from G to E go through either D or H. D (sequential) is blocked since D is
 d_separated(AB,F,GH) is false.
 Path B-E-H is not blocked: E (sequential) is open since E is not in {F}.
 
-(c) P(a, b, c, d, e, f, g, h) = P(a) * P(b) * P(c | a) * P(d | a,b) * P(e | b) * P(f | c,d) * P(h | e,f) * P(g | f)
+(c) 
+P(a, b, c, d, e, f, g, h) = P(a) * P(b) * P(c | a) * P(d | a,b) * P(e | b) * P(f | c,d) * P(h | e,f) * P(g | f)
 
-(d) P(A = 0, B = 0) = P(A = 0) * P(B = 0) = 0.24, since A and B are independent
-P(E = 1 | A = 1) = P(E = 1) since A and E are independent
+(d) 
+P(A = 0, B = 0) = P(A = 0) * P(B = 0) = 0.24, since A and B are independent
+
+P(E = 1 | A = 1) = P(E = 1), since A and E are independent
 P(E = 1) = P(E = 1, B = 0) + P(E = 1, B = 1)
   = P(E = 1 | B = 0) * P(B = 0) + P(E = 1 | B = 1) * P(B = 1)
   = 0.9 * 0.3 + 0.1 * 0.7 = 0.34
