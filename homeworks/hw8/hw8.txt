@@ -1,0 +1,83 @@
+Zhehao Wang
+404380075
+zhehao@cs.ucla.edu
+
+1. 
+(a) see test.net
+(b) To make Pr(D|T) >= 0.30, we can constrain one of the following:
+ - the prior of having the disease >= 0.8942%
+ - the false positive rate <= 0.2219%
+And changing false negative rate cannot achieve Pr(D|T) >= 0.30
+
+2.
+(a) set of variables and values:
+  ExpectingGuests,    yes/no
+  FamilyHome,         yes/no
+  SoundSensor,        on/off
+  LightSensor,        on/off
+  HearableBarking,    yes/no
+  Battery,            ok/dead
+  SoundSensorHealth,  ok/broken
+  LightSensorHealth,  ok/broken
+  DogBarking,         yes/no
+  DogOutside,         yes/no
+  OutdoorLight,       on/off
+  DogBowelTrouble,    yes/no
+(b) causal structure looks like the following:
+ExpectingGuests                                     LightSensorHealth
+     |                                                       |
+     |-----> OutdoorLight --------------------------------------> LightSensor
+     |                                                       |
+FamilyHome                                                Battery
+     |                                                       |
+     |-----> DogOutside --> DogBarking -- >HearableBarking ----> SoundSensor
+     |                                                       |
+DogBowelTrouble                                      SoundSensorHealth
+(c) learnt results available in sambot.net (using the network in (b), learning (with 
+default parameters and uniform parameters for initial network) using given sambot.dat)
+
+Answers: 
+(1) the most likely instantiation of all variables given that Sambot has sensed the 
+lights to be on, but has sensed no bark.
+
+Most likely instantiation:
+  ExpectingGuests,    no
+  FamilyHome,         no
+  HearableBarking,    no
+  Battery,            ok
+  SoundSensorHealth,  ok
+  LightSensorHealth,  ok
+  DogBarking,         no
+  DogOutside,         yes
+  OutdoorLight,       on
+  DogBowelTrouble,    yes
+
+This conclusion is reached by setting LightSensor = On, SoundSensor = Off and 
+reporting the value of variable that has largest probability in the resulting CPT.
+
+(2) the most likely instantiation of the sensors given that the family is home and 
+no guests are expected.
+
+Most likely instantiation:
+  SoundSensor,        off
+  LightSensor,        off
+  HearableBarking,    no
+  Battery,            ok
+  SoundSensorHealth,  ok
+  LightSensorHealth,  ok
+  DogBarking,         yes
+  DogOutside,         yes
+  OutdoorLight,       off
+  DogBowelTrouble,    yes
+
+This conclusion is reached by setting ExpectingGuests = No, FamilyHome = Yes
+
+(3) Z = {Battery, FamilyHome} would be a smallest set such that given Z SoundSensor
+and LightSensor are independent.
+There are two paths from SoundSensor to LightSensor, Battery is the only node 
+on a divergent path, thus Battery need to be in Z.
+All nodes on the other path are either sequential or divergent, thus putting one
+among FamilyHome, OutdoorLight, DogOutside, DogBarking or HearableBarking into Z
+would block this path.
+
+(4) The network is a multiply-connected.
