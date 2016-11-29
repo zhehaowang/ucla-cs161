@@ -23,6 +23,7 @@ And changing false negative rate cannot achieve Pr(D|T) >= 0.30
   DogOutside,         yes/no
   OutdoorLight,       on/off
   DogBowelTrouble,    yes/no
+
 (b) causal structure looks like the following:
 ExpectingGuests                                     LightSensorHealth
      |                                                       |
@@ -33,6 +34,7 @@ FamilyHome                                                Battery
      |-----> DogOutside --> DogBarking -- >HearableBarking ----> SoundSensor
      |                                                       |
 DogBowelTrouble                                      SoundSensorHealth
+
 (c) learnt results available in sambot.net (using the network in (b), learning (with 
 default parameters and uniform parameters for initial network) using given sambot.dat)
 
@@ -52,8 +54,9 @@ Most likely instantiation:
   OutdoorLight,       on
   DogBowelTrouble,    yes
 
-This conclusion is reached by setting LightSensor = On, SoundSensor = Off and 
-reporting the value of variable that has largest probability in the resulting CPT.
+After constructing the network and learning using given .dat file (default parameters), 
+this conclusion is reached by setting LightSensor = On, SoundSensor = Off and reporting
+the value with higher probability as shown in SamIam monitor.
 
 (2) the most likely instantiation of the sensors given that the family is home and 
 no guests are expected.
