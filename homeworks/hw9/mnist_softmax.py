@@ -38,8 +38,10 @@ def main(_):
 
   # Create the model
   x = tf.placeholder(tf.float32, [None, 784])
-  W = tf.Variable(tf.zeros([784, 10]))
-  b = tf.Variable(tf.zeros([10]))
+  W = tf.Variable(tf.ones([784, 10]))
+  b = tf.Variable(tf.ones([10]))
+  # W = tf.Variable(tf.zeros([784, 10]))
+  # b = tf.Variable(tf.zeros([10]))
   y = tf.matmul(x, W) + b
 
   # Define loss and optimizer
@@ -69,6 +71,10 @@ def main(_):
   accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
   print(sess.run(accuracy, feed_dict={x: mnist.test.images,
                                       y_: mnist.test.labels}))
+
+  # Pb1: Test trained model on the training set...
+  # print(sess.run(accuracy, feed_dict={x: mnist.train.images,
+  #                                     y_: mnist.train.labels}))
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
