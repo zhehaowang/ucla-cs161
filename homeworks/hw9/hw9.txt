@@ -1,0 +1,8 @@
+Zhehao Wang
+404380075
+zhehao@cs.ucla.edu
+
+(before answering any questions, modifications were done to the given mnist_softmax.py, so
+that the script works with TensorFlow 0.11, the default version from the website)
+
+3.1
