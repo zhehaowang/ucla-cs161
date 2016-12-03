@@ -42,13 +42,17 @@ c13. false, from a and c12
 Since we derived false from delta & ~alpha, we know that John likes Peanut
 
 (d)
+Query: (E x)(eat(Sue, x) && food(x))
+Negate query and we have
+d. (TBD)
+
 d9. eat(Sue, Peanut), from 6 and 8, subst({x8/Peanut})
 Also we have c11. food(Peanut)
 Thus we know that Sue eats the food Peanut
 
 (e)
 We remove 6 and 7 from KB, and add the following:
-(A x)(~die(x) => (E y) eat(x, y))
+(A x)(~die(x) => (E y) eat(x, y))   (A x)((~ E y)(eat(x, y))) => die(x) (given as correct, contraposition of ours)
 (A x)(die(x) => ~alive(x))
 alive(Bill)
 
@@ -63,8 +67,7 @@ e14. eat(Sue, f(Bill)), 8 and e13, subst({x8/f(Bill)})
 e15. kill(f(Bill), Bill) | food(f(Bill)), from 4 and e13, subst({y4/Bill, x4/f(Bill)})
 e16. ~kill(x5, Bill), from 5 and e11, subst({y5/Bill})
 e17. food(f(Bill)), from e15 and e16, subst({x5/f(Bill)})
-Given e17, e14, and 3, we can unify by subst({f(Bill)/Chicken}); similarly for e17, e14 and 2.
-Thus we know Sue eats the food Chicken and Apples.
+From e17 and e14, we know that Sue eats the food that’s a function ob Bill (should also apply resolution for this step)
 
 * Problem 3.
 
