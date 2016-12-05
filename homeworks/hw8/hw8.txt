@@ -56,7 +56,7 @@ Most likely instantiation:
 
 After constructing the network and learning using given .dat file (default parameters), 
 this conclusion is reached by setting LightSensor = On, SoundSensor = Off and reporting
-the value with higher probability as shown in SamIam monitor.
+the value with higher probability as shown in SamIam most probable explanation screen.
 
 (2) the most likely instantiation of the sensors given that the family is home and 
 no guests are expected.
@@ -68,7 +68,7 @@ Most likely instantiation:
   Battery,            ok
   SoundSensorHealth,  ok
   LightSensorHealth,  ok
-  DogBarking,         yes
+  DogBarking,         no
   DogOutside,         yes
   OutdoorLight,       off
   DogBowelTrouble,    yes
